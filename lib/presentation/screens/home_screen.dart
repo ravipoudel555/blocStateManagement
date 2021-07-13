@@ -8,8 +8,9 @@ const TextStyle kFontStyle = TextStyle(
 );
 
 class HomeScreen extends StatelessWidget {
+  final snackBar = SnackBar(content: Text('Yay! A SnackBar!'));
   final String title;
-  const HomeScreen({Key? key, required this.title}) : super(key: key);
+  HomeScreen({Key? key, required this.title}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -18,41 +19,60 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(title),
       ),
-      body: Center(
-        child: Column(
-          children: [
-            BlocBuilder<CounterCubit, CounterState>(
-              builder: (context, state) {
-                return Text(
-                  state.counterValue.toString(),
-                  style: kFontStyle,
-                );
-              },
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                MaterialButton(
-                  child: Container(
-                    color: Colors.blueAccent,
-                    child: Icon(Icons.remove),
+      body: BlocListener<CounterCubit, CounterState>(
+        listener: (context, state) {
+          if (state.wasIncremented) {
+            Scaffold.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Incremented'),
+                duration: Duration(milliseconds: 500),
+              ),
+            );
+          } else {
+            Scaffold.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Decremented'),
+                duration: Duration(milliseconds: 500),
+              ),
+            );
+          }
+        },
+        child: Center(
+          child: Column(
+            children: [
+              BlocBuilder<CounterCubit, CounterState>(
+                builder: (context, state) {
+                  return Text(
+                    state.counterValue.toString(),
+                    style: kFontStyle,
+                  );
+                },
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  MaterialButton(
+                    child: Container(
+                      color: Colors.blueAccent,
+                      child: Icon(Icons.remove),
+                    ),
+                    onPressed: () {
+                      BlocProvider.of<CounterCubit>(context).decrement();
+                    },
                   ),
-                  onPressed: () {
-                    BlocProvider.of<CounterCubit>(context).decrement();
-                  },
-                ),
-                MaterialButton(
-                  child: Container(
-                    color: Colors.blueAccent,
-                    child: Icon(Icons.add),
+                  MaterialButton(
+                    child: Container(
+                      color: Colors.blueAccent,
+                      child: Icon(Icons.add),
+                    ),
+                    onPressed: () {
+                      BlocProvider.of<CounterCubit>(context).increment();
+                    },
                   ),
-                  onPressed: () {
-                    BlocProvider.of<CounterCubit>(context).increment();
-                  },
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
