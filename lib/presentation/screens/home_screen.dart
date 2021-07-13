@@ -16,66 +16,124 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print(title);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
-      body: Center(
-        child: Column(
-          children: [
-            BlocBuilder<InternetCubit, InternetState>(
-              builder: (context, state) {
-                if (state is InternetConnected &&
-                    state.connectionType == ConnectionType.Wifi) {
+    return BlocListener<InternetCubit, InternetState>(
+      listener: (context, state) {
+        if (state is InternetConnected &&
+            state.connectionType == ConnectionType.Wifi) {
+          BlocProvider.of<CounterCubit>(context).increment();
+        } else if (state is InternetConnected &&
+            state.connectionType == ConnectionType.Mobile) {
+          BlocProvider.of<CounterCubit>(context).decrement();
+        } else if (state is InternetDisonnected) {}
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(title),
+        ),
+        body: Center(
+          child: Column(
+            children: [
+              BlocBuilder<InternetCubit, InternetState>(
+                builder: (context, state) {
+                  if (state is InternetConnected &&
+                      state.connectionType == ConnectionType.Wifi) {
+                    return Text(
+                      'Wifi',
+                      style: kFontStyle,
+                    );
+                  } else if (state is InternetConnected &&
+                      state.connectionType == ConnectionType.Mobile) {
+                    return Text(
+                      'Mobile',
+                      style: kFontStyle,
+                    );
+                  } else if (state is InternetDisonnected) {
+                    return Text('Disconnected');
+                  }
+                  return CircularProgressIndicator();
+                },
+              ),
+
+              BlocBuilder<CounterCubit, CounterState>(
+                builder: (context, state) {
                   return Text(
-                    'Wifi',
+                    state.counterValue.toString(),
                     style: kFontStyle,
                   );
-                } else if (state is InternetConnected &&
-                    state.connectionType == ConnectionType.Mobile) {
-                  return Text(
-                    'Mobile',
-                    style: kFontStyle,
-                  );
-                } else if (state is InternetDisonnected) {
-                  return Text('Disconnected');
-                }
-                return CircularProgressIndicator();
-              },
-            ),
-
-            BlocBuilder<CounterCubit, CounterState>(
-              builder: (context, state) {
-                return Text(
-                  state.counterValue.toString(),
-                  style: kFontStyle,
-                );
-              },
-            ),
-
-            //--------------------------------Navigation buttons below-----------------------------------------
-            SizedBox(height: 100),
-            MaterialButton(
-              child: Container(
-                padding: EdgeInsets.all(10),
-                color: Colors.blueAccent,
-                child: Text('Go to second screen'),
+                },
               ),
-              onPressed: () {
-                Navigator.pushNamed(context, '/second');
-              },
-            ),
-            MaterialButton(
-              child: Container(
-                padding: EdgeInsets.all(10),
-                color: Colors.blueAccent,
-                child: Text('Go to third screen'),
+
+              SizedBox(height: 30),
+              //UI change for multiple CubitState changes
+              // Builder(
+              //   builder: (context) {
+              //     final counterState = context.watch<CounterCubit>().state;
+              //     final internetState = context.watch<InternetCubit>().state;
+
+              //     if (internetState is InternetConnected &&
+              //         internetState.connectionType == ConnectionType.Wifi) {
+              //       return Text('Counter:' +
+              //           counterState.counterValue.toString() +
+              //           '   Internet: Wifi');
+              //     } else if (internetState is InternetConnected &&
+              //         internetState.connectionType == ConnectionType.Mobile) {
+              //       return Text('Counter:' +
+              //           counterState.counterValue.toString() +
+              //           '   Internet: Mobile');
+              //     } else {
+              //       return Text('Counter:' +
+              //           counterState.counterValue.toString() +
+              //           '   Internet: Disconnected');
+              //     }
+              //   },
+              // ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   children: [
+              //     MaterialButton(
+              //       child: Container(
+              //         color: Colors.orangeAccent,
+              //         child: Icon(Icons.remove),
+              //       ),
+              //       onPressed: () {
+              //         BlocProvider.of<CounterCubit>(context).decrement();
+              //       },
+              //     ),
+              //     MaterialButton(
+              //       child: Container(
+              //         color: Colors.orangeAccent,
+              //         child: Icon(Icons.add),
+              //       ),
+              //       onPressed: () {
+              //         BlocProvider.of<CounterCubit>(context).increment();
+              //       },
+              //     ),
+              //   ],
+              // ),
+              //--------------------------------Navigation buttons below-----------------------------------------
+              SizedBox(height: 100),
+              MaterialButton(
+                child: Container(
+                  padding: EdgeInsets.all(10),
+                  color: Colors.blueAccent,
+                  child: Text('Go to second screen'),
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/second');
+                },
               ),
-              onPressed: () {
-                Navigator.pushNamed(context, '/third');
-              },
-            ),
-          ],
+              MaterialButton(
+                child: Container(
+                  padding: EdgeInsets.all(10),
+                  color: Colors.blueAccent,
+                  child: Text('Go to third screen'),
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/third');
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
