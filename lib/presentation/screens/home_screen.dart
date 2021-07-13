@@ -8,7 +8,6 @@ const TextStyle kFontStyle = TextStyle(
 );
 
 class HomeScreen extends StatelessWidget {
-  final snackBar = SnackBar(content: Text('Yay! A SnackBar!'));
   final String title;
   HomeScreen({Key? key, required this.title}) : super(key: key);
 
@@ -70,6 +69,28 @@ class HomeScreen extends StatelessWidget {
                     },
                   ),
                 ],
+              ),
+              //--------------------------------Navigation buttons below-----------------------------------------
+              SizedBox(height: 100),
+              MaterialButton(
+                child: Container(
+                  padding: EdgeInsets.all(10),
+                  color: Colors.blueAccent,
+                  child: Text('Go to second screen'),
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/second');
+                },
+              ),
+              MaterialButton(
+                child: Container(
+                  padding: EdgeInsets.all(10),
+                  color: Colors.blueAccent,
+                  child: Text('Go to third screen'),
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/third');
+                },
               ),
             ],
           ),

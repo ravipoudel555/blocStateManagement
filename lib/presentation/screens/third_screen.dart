@@ -1,4 +1,8 @@
+import 'dart:developer';
+
+import 'package:bloc_flutter/logic/cubit/counter_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 const TextStyle kFontStyle = TextStyle(
   fontSize: 50,
@@ -22,9 +26,30 @@ class ThirdScreen extends StatelessWidget {
       body: Center(
         child: Column(
           children: [
-            Text(
-              '1',
-              style: kFontStyle,
+            BlocConsumer<CounterCubit, CounterState>(
+              listener: (context, state) {
+                if (state.wasIncremented) {
+                  Scaffold.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Incremented'),
+                      duration: Duration(milliseconds: 500),
+                    ),
+                  );
+                } else {
+                  Scaffold.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Decremented'),
+                      duration: Duration(milliseconds: 500),
+                    ),
+                  );
+                }
+              },
+              builder: (context, state) {
+                return Text(
+                  state.counterValue.toString(),
+                  style: kFontStyle,
+                );
+              },
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -32,16 +57,20 @@ class ThirdScreen extends StatelessWidget {
                 MaterialButton(
                   child: Container(
                     color: pageColor,
-                    child: Icon(Icons.add),
+                    child: Icon(Icons.remove),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    BlocProvider.of<CounterCubit>(context).decrement();
+                  },
                 ),
                 MaterialButton(
                   child: Container(
                     color: pageColor,
-                    child: Icon(Icons.remove),
+                    child: Icon(Icons.add),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    BlocProvider.of<CounterCubit>(context).increment();
+                  },
                 ),
               ],
             ),
