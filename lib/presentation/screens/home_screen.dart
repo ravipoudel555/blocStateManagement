@@ -1,4 +1,6 @@
+import 'package:bloc_flutter/constants/enums.dart';
 import 'package:bloc_flutter/logic/cubit/counter_cubit.dart';
+import 'package:bloc_flutter/logic/cubit/internet_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -18,82 +20,62 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(title),
       ),
-      body: BlocListener<CounterCubit, CounterState>(
-        listener: (context, state) {
-          if (state.wasIncremented) {
-            Scaffold.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Incremented'),
-                duration: Duration(milliseconds: 500),
-              ),
-            );
-          } else {
-            Scaffold.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Decremented'),
-                duration: Duration(milliseconds: 500),
-              ),
-            );
-          }
-        },
-        child: Center(
-          child: Column(
-            children: [
-              BlocBuilder<CounterCubit, CounterState>(
-                builder: (context, state) {
+      body: Center(
+        child: Column(
+          children: [
+            BlocBuilder<InternetCubit, InternetState>(
+              builder: (context, state) {
+                if (state is InternetConnected &&
+                    state.connectionType == ConnectionType.Wifi) {
                   return Text(
-                    state.counterValue.toString(),
+                    'Wifi',
                     style: kFontStyle,
                   );
-                },
+                } else if (state is InternetConnected &&
+                    state.connectionType == ConnectionType.Mobile) {
+                  return Text(
+                    'Mobile',
+                    style: kFontStyle,
+                  );
+                } else if (state is InternetDisonnected) {
+                  return Text('Disconnected');
+                }
+                return CircularProgressIndicator();
+              },
+            ),
+
+            BlocBuilder<CounterCubit, CounterState>(
+              builder: (context, state) {
+                return Text(
+                  state.counterValue.toString(),
+                  style: kFontStyle,
+                );
+              },
+            ),
+
+            //--------------------------------Navigation buttons below-----------------------------------------
+            SizedBox(height: 100),
+            MaterialButton(
+              child: Container(
+                padding: EdgeInsets.all(10),
+                color: Colors.blueAccent,
+                child: Text('Go to second screen'),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  MaterialButton(
-                    child: Container(
-                      color: Colors.blueAccent,
-                      child: Icon(Icons.remove),
-                    ),
-                    onPressed: () {
-                      BlocProvider.of<CounterCubit>(context).decrement();
-                    },
-                  ),
-                  MaterialButton(
-                    child: Container(
-                      color: Colors.blueAccent,
-                      child: Icon(Icons.add),
-                    ),
-                    onPressed: () {
-                      BlocProvider.of<CounterCubit>(context).increment();
-                    },
-                  ),
-                ],
+              onPressed: () {
+                Navigator.pushNamed(context, '/second');
+              },
+            ),
+            MaterialButton(
+              child: Container(
+                padding: EdgeInsets.all(10),
+                color: Colors.blueAccent,
+                child: Text('Go to third screen'),
               ),
-              //--------------------------------Navigation buttons below-----------------------------------------
-              SizedBox(height: 100),
-              MaterialButton(
-                child: Container(
-                  padding: EdgeInsets.all(10),
-                  color: Colors.blueAccent,
-                  child: Text('Go to second screen'),
-                ),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/second');
-                },
-              ),
-              MaterialButton(
-                child: Container(
-                  padding: EdgeInsets.all(10),
-                  color: Colors.blueAccent,
-                  child: Text('Go to third screen'),
-                ),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/third');
-                },
-              ),
-            ],
-          ),
+              onPressed: () {
+                Navigator.pushNamed(context, '/third');
+              },
+            ),
+          ],
         ),
       ),
     );
